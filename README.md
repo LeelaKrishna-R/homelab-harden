@@ -1,5 +1,7 @@
 # homelab-harden
 
+[![CI](https://github.com/LeelaKrishna-R/homelab-harden/actions/workflows/ci.yml/badge.svg)](https://github.com/LeelaKrishna-R/homelab-harden/actions/workflows/ci.yml)
+
 A read-only security auditor for a Linux homelab server. Run it on the box and it
 checks the handful of things a fresh server usually gets wrong: SSH left open to
 root or passwords, no firewall, no automatic updates, no brute-force protection, a
