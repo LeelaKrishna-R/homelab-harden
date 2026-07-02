@@ -1,0 +1,50 @@
+from homelab_harden.facts import Facts, Listener, SshConfig
+from homelab_harden.rules import evaluate
+from homelab_harden.sample import sample_clean_facts, sample_insecure_facts
+
+
+def rule_ids(findings):
+    return {f.rule for f in findings}
+
+
+def test_clean_sample_has_no_findings():
+    assert evaluate(sample_clean_facts()) == []
+
+
+def test_insecure_sample_flags_expected_rules():
+    ids = rule_ids(evaluate(sample_insecure_facts()))
+    assert {"HH001", "HH002", "HH004", "HH005", "HH006", "HH007", "HH009"} <= ids
+
+
+def test_unset_ssh_values_are_not_flagged():
+    facts = Facts(platform="linux", ssh=SshConfig())
+    assert evaluate(facts) == []
+
+
+def test_root_login_without_password_is_not_flagged():
+    facts = Facts(platform="linux", ssh=SshConfig(permit_root_login="prohibit-password"))
+    assert rule_ids(evaluate(facts)) == set()
+
+
+def test_firewall_unknown_is_not_flagged_but_inactive_is():
+    assert evaluate(Facts(platform="linux", firewall_active=None)) == []
+    assert rule_ids(evaluate(Facts(platform="linux", firewall_active=False))) == {"HH004"}
+
+
+def test_listener_rule_only_flags_sensitive_wildcard_ports():
+    facts = Facts(
+        platform="linux",
+        listeners=[
+            Listener("tcp", "0.0.0.0", 22, "sshd"),
+            Listener("tcp", "127.0.0.1", 5432, "postgres"),
+            Listener("tcp", "0.0.0.0", 6379, "redis"),
+        ],
+    )
+    findings = evaluate(facts)
+    assert rule_ids(findings) == {"HH009"}
+    assert "Redis" in findings[0].message
+
+
+def test_findings_sorted_high_first():
+    severities = [f.severity for f in evaluate(sample_insecure_facts())]
+    assert severities == sorted(severities, key=lambda s: {"high": 0, "medium": 1, "low": 2}[s])
