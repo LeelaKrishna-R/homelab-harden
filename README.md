@@ -52,6 +52,7 @@ sudo homelab-harden
 
 python3 -m homelab_harden --json         # machine-readable output
 homelab-harden --fail-on medium          # exit non-zero on medium+ findings
+homelab-harden --ignore HH006            # leave out a rule you've accepted (repeat, or HH006,HH007)
 ```
 
 Run with `sudo` for the full picture: reading `/etc/shadow` (empty-password accounts)
@@ -104,7 +105,7 @@ Kept small for v0.1. Likely next:
 - **Remote mode**: audit another box over SSH (`homelab-harden user@host`).
 - **More checks, opt-in**: world-writable files, SUID anomalies, sysctl hardening,
   SSH `MaxAuthTries` / key algorithms.
-- **Ignore / config**: silence a rule you've accepted.
+- **A config file** for the rules you `--ignore` every time, so cron runs stay short.
 - **zipapp / single-file** build so it runs with one `curl`.
 
 Have a check you keep wishing existed? Open an issue.

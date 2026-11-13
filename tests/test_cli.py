@@ -26,3 +26,35 @@ def test_clean_host_exits_zero(monkeypatch, capsys):
     assert cli.main(["--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["findings"] == []
+
+
+def test_ignore_silences_an_accepted_rule(capsys):
+    cli.main(["--demo", "--json"])
+    rules = {f["rule"] for f in json.loads(capsys.readouterr().out)["findings"]}
+    assert "HH006" in rules
+    cli.main(["--demo", "--json", "--ignore", "HH006", "--ignore", "hh001,HH002"])
+    payload = json.loads(capsys.readouterr().out)
+    left = {f["rule"] for f in payload["findings"]}
+    assert not left & {"HH006", "HH001", "HH002"} and left
+    assert payload["ignored"] == ["HH001", "HH002", "HH006"]
+
+
+def test_ignoring_every_high_finding_changes_the_exit_code(monkeypatch, capsys):
+    cli.main(["--demo", "--json"])
+    highs = sorted(
+        {
+            f["rule"]
+            for f in json.loads(capsys.readouterr().out)["findings"]
+            if f["severity"] == "high"
+        }
+    )
+    assert cli.main(["--demo", "--ignore", ",".join(highs)]) == 0
+    assert "ignored" in capsys.readouterr().out
+
+
+def test_an_unknown_rule_id_is_a_usage_error(capsys):
+    import pytest
+
+    with pytest.raises(SystemExit) as e:
+        cli.main(["--demo", "--ignore", "HH999"])
+    assert e.value.code == 2

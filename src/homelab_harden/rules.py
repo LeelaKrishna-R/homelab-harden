@@ -19,6 +19,8 @@ SENSITIVE_PORTS = {
 
 _WILDCARD_HOSTS = {"0.0.0.0", "::", "*", ""}
 
+RULE_IDS = tuple(f"HH{n:03d}" for n in range(1, 10))
+
 
 def evaluate(facts: Facts) -> list[Finding]:
     out: list[Finding] = []

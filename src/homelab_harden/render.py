@@ -24,7 +24,9 @@ def counts(findings: list[Finding]) -> dict[str, int]:
     return {sev: sum(1 for f in findings if f.severity == sev) for sev in ("high", "medium", "low")}
 
 
-def render_report(facts: Facts, findings: list[Finding], color: bool) -> str:
+def render_report(
+    facts: Facts, findings: list[Finding], color: bool, ignored: list[str] | None = None
+) -> str:
     def paint(code: str) -> str:
         return _COLOR[code] if color else ""
 
@@ -37,6 +39,8 @@ def render_report(facts: Facts, findings: list[Finding], color: bool) -> str:
             lines.append(f"         {paint('dim')}-> {f.fix}{paint('reset')}")
         n = counts(findings)
         lines += ["", f"  {n['high']} high, {n['medium']} medium, {n['low']} low"]
+    if ignored:
+        lines.append(f"  {paint('dim')}ignored (--ignore): {', '.join(ignored)}{paint('reset')}")
     for note in facts.notes:
         lines.append(f"  {paint('dim')}note: {note}{paint('reset')}")
     return "\n".join(lines)
