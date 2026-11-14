@@ -53,6 +53,7 @@ sudo homelab-harden
 python3 -m homelab_harden --json         # machine-readable output
 homelab-harden --fail-on medium          # exit non-zero on medium+ findings
 homelab-harden --ignore HH006            # leave out a rule you've accepted (repeat, or HH006,HH007)
+homelab-harden --list-rules              # every rule id, its severity and what it checks
 ```
 
 Run with `sudo` for the full picture: reading `/etc/shadow` (empty-password accounts)

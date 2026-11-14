@@ -8,7 +8,7 @@ from dataclasses import asdict
 from homelab_harden.collect import collect
 from homelab_harden.facts import SEVERITY_RANK
 from homelab_harden.render import counts, render_report, use_color
-from homelab_harden.rules import RULE_IDS, evaluate
+from homelab_harden.rules import RULE_IDS, RULES, evaluate
 from homelab_harden.sample import sample_insecure_facts
 
 
@@ -31,12 +31,21 @@ def main(argv: list[str] | None = None) -> int:
         metavar="RULE",
         help="leave out a rule you've accepted, e.g. --ignore HH006 (repeat it or use commas)",
     )
+    parser.add_argument(
+        "--list-rules",
+        action="store_true",
+        help="print every rule id, its severity and what it checks",
+    )
     parser.add_argument("--no-color", action="store_true")
     parser.add_argument(
         "--demo", action="store_true", help="audit bundled sample data (works on any OS)"
     )
     parser.add_argument("--version", action="version", version="homelab-harden 0.1.0")
     args = parser.parse_args(argv)
+    if args.list_rules:
+        for rule, (severity, what) in RULES.items():
+            print(f"{rule}  {severity:<6}  {what}")
+        return 0
     ignored = sorted(
         {r.strip().upper() for arg in args.ignore for r in arg.split(",") if r.strip()}
     )

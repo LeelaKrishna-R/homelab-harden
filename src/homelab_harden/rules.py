@@ -19,7 +19,22 @@ SENSITIVE_PORTS = {
 
 _WILDCARD_HOSTS = {"0.0.0.0", "::", "*", ""}
 
-RULE_IDS = tuple(f"HH{n:03d}" for n in range(1, 10))
+# Every rule: id -> (severity, what it checks). The README's table says the same.
+RULES: dict[str, tuple[str, str]] = {
+    "HH001": ("high", "SSH permits direct root login (PermitRootLogin yes)"),
+    "HH002": ("high", "SSH allows password authentication"),
+    "HH003": ("high", "SSH permits empty passwords"),
+    "HH004": ("high", "No active host firewall (ufw / firewalld / nftables / iptables)"),
+    "HH005": ("medium", "Automatic security updates not enabled"),
+    "HH006": ("medium", "fail2ban not running"),
+    "HH007": ("medium", "Passwordless sudo (NOPASSWD) configured"),
+    "HH008": ("high", "Accounts with empty passwords"),
+    "HH009": (
+        "high",
+        "A datastore (Postgres, MySQL, Redis, Mongo, ...) listening on all interfaces",
+    ),
+}
+RULE_IDS = tuple(RULES)
 
 
 def evaluate(facts: Facts) -> list[Finding]:

@@ -58,3 +58,18 @@ def test_an_unknown_rule_id_is_a_usage_error(capsys):
     with pytest.raises(SystemExit) as e:
         cli.main(["--demo", "--ignore", "HH999"])
     assert e.value.code == 2
+
+
+def test_list_rules_prints_every_rule_and_exits_zero(capsys):
+    assert cli.main(["--list-rules"]) == 0
+    lines = capsys.readouterr().out.strip().splitlines()
+    assert len(lines) == 9 and lines[0].startswith("HH001  high")
+    assert any(line.startswith("HH006  medium") and "fail2ban" in line for line in lines)
+
+
+def test_every_rule_the_audit_can_raise_is_listed(capsys):
+    from homelab_harden.rules import RULES, evaluate
+    from homelab_harden.sample import sample_insecure_facts
+
+    for f in evaluate(sample_insecure_facts()):
+        assert f.rule in RULES and RULES[f.rule][0] == f.severity, f
