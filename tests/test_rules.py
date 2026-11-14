@@ -48,3 +48,14 @@ def test_listener_rule_only_flags_sensitive_wildcard_ports():
 def test_findings_sorted_high_first():
     severities = [f.severity for f in evaluate(sample_insecure_facts())]
     assert severities == sorted(severities, key=lambda s: {"high": 0, "medium": 1, "low": 2}[s])
+
+
+def test_max_auth_tries_flags_only_a_raised_value():
+    def audit(tries):
+        return evaluate(Facts(platform="linux", ssh=SshConfig(max_auth_tries=tries)))
+
+    for tries in ("6", "3", "junk"):
+        assert audit(tries) == []
+    found = audit("10")
+    assert [(f.rule, f.severity) for f in found] == [("HH010", "low")]
+    assert "MaxAuthTries 10" in found[0].message

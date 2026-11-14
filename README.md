@@ -90,6 +90,7 @@ python3 -m homelab_harden
 | HH007 | medium | Passwordless sudo (`NOPASSWD`) configured |
 | HH008 | high | Accounts with empty passwords |
 | HH009 | high | A datastore (Postgres, MySQL, Redis, Mongo, …) listening on all interfaces |
+| HH010 | low | SSH `MaxAuthTries` raised above OpenSSH's default of 6 |
 
 It only reports things that are actually misconfigured. An SSH directive that is simply
 unset, or a check it couldn't run, becomes a `note`, not a false alarm.
@@ -105,7 +106,7 @@ Kept small for v0.1. Likely next:
 
 - **Remote mode**: audit another box over SSH (`homelab-harden user@host`).
 - **More checks, opt-in**: world-writable files, SUID anomalies, sysctl hardening,
-  SSH `MaxAuthTries` / key algorithms.
+  SSH key algorithms.
 - **A config file** for the rules you `--ignore` every time, so cron runs stay short.
 - **zipapp / single-file** build so it runs with one `curl`.
 

@@ -18,6 +18,7 @@ class SshConfig:
     permit_root_login: str | None = None
     password_authentication: str | None = None
     permit_empty_passwords: str | None = None
+    max_auth_tries: str | None = None
     source: str = "unavailable"
 
 

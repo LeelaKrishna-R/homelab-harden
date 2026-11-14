@@ -18,6 +18,9 @@ SENSITIVE_PORTS = {
 }
 
 _WILDCARD_HOSTS = {"0.0.0.0", "::", "*", ""}
+# Each extra attempt per connection is another free guess for a brute-forcer;
+# only a value raised above the default is flagged.
+_SSH_DEFAULT_MAX_AUTH_TRIES = 6
 
 # Every rule: id -> (severity, what it checks). The README's table says the same.
 RULES: dict[str, tuple[str, str]] = {
@@ -33,6 +36,7 @@ RULES: dict[str, tuple[str, str]] = {
         "high",
         "A datastore (Postgres, MySQL, Redis, Mongo, ...) listening on all interfaces",
     ),
+    "HH010": ("low", "SSH MaxAuthTries raised above OpenSSH's default of 6"),
 }
 RULE_IDS = tuple(RULES)
 
@@ -77,6 +81,16 @@ def _ssh_rules(ssh: SshConfig) -> list[Finding]:
                 "high",
                 "SSH permits empty passwords (PermitEmptyPasswords yes)",
                 "Set `PermitEmptyPasswords no` in /etc/ssh/sshd_config and reload sshd",
+            )
+        )
+    tries = ssh.max_auth_tries or ""
+    if tries.isdigit() and int(tries) > _SSH_DEFAULT_MAX_AUTH_TRIES:
+        out.append(
+            Finding(
+                "HH010",
+                "low",
+                f"SSH allows {tries} authentication attempts per connection (MaxAuthTries {tries})",
+                "Set `MaxAuthTries 4` in /etc/ssh/sshd_config and reload sshd",
             )
         )
     return out
