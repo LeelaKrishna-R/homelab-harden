@@ -59,3 +59,11 @@ def test_max_auth_tries_flags_only_a_raised_value():
     found = audit("10")
     assert [(f.rule, f.severity) for f in found] == [("HH010", "low")]
     assert "MaxAuthTries 10" in found[0].message
+
+
+def test_x11_forwarding_is_flagged_only_when_on():
+    def audit(value):
+        return rule_ids(evaluate(Facts(platform="linux", ssh=SshConfig(x11_forwarding=value))))
+
+    assert audit("yes") == {"HH011"}
+    assert audit("no") == set() and audit(None) == set()

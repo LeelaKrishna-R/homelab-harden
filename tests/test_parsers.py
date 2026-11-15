@@ -66,3 +66,7 @@ def test_parse_ss_listeners_handles_ipv4_ipv6_and_process():
 def test_parse_sshd_config_reads_max_auth_tries():
     assert parsers.parse_sshd_config("maxauthtries 10\n", "sshd -T").max_auth_tries == "10"
     assert parsers.parse_sshd_config("MaxAuthTries 3\n").max_auth_tries == "3"
+
+
+def test_parse_sshd_config_reads_x11_forwarding():
+    assert parsers.parse_sshd_config("x11forwarding yes\n", "sshd -T").x11_forwarding == "yes"

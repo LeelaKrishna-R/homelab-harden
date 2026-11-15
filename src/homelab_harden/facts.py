@@ -19,6 +19,7 @@ class SshConfig:
     password_authentication: str | None = None
     permit_empty_passwords: str | None = None
     max_auth_tries: str | None = None
+    x11_forwarding: str | None = None
     source: str = "unavailable"
 
 

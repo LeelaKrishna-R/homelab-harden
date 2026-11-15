@@ -4,7 +4,13 @@ import re
 
 from homelab_harden.facts import Listener, SshConfig
 
-_SSH_KEYS = {"permitrootlogin", "passwordauthentication", "permitemptypasswords", "maxauthtries"}
+_SSH_KEYS = {
+    "permitrootlogin",
+    "passwordauthentication",
+    "permitemptypasswords",
+    "maxauthtries",
+    "x11forwarding",
+}
 _PROC_NAME = re.compile(r'\("([^"]+)"')
 
 
@@ -25,6 +31,7 @@ def parse_sshd_config(text: str, source: str = "config file") -> SshConfig:
         password_authentication=found.get("passwordauthentication"),
         permit_empty_passwords=found.get("permitemptypasswords"),
         max_auth_tries=found.get("maxauthtries"),
+        x11_forwarding=found.get("x11forwarding"),
         source=source,
     )
 

@@ -37,6 +37,7 @@ RULES: dict[str, tuple[str, str]] = {
         "A datastore (Postgres, MySQL, Redis, Mongo, ...) listening on all interfaces",
     ),
     "HH010": ("low", "SSH MaxAuthTries raised above OpenSSH's default of 6"),
+    "HH011": ("low", "SSH X11 forwarding enabled on a server"),
 }
 RULE_IDS = tuple(RULES)
 
@@ -91,6 +92,15 @@ def _ssh_rules(ssh: SshConfig) -> list[Finding]:
                 "low",
                 f"SSH allows {tries} authentication attempts per connection (MaxAuthTries {tries})",
                 "Set `MaxAuthTries 4` in /etc/ssh/sshd_config and reload sshd",
+            )
+        )
+    if (ssh.x11_forwarding or "").lower() == "yes":
+        out.append(
+            Finding(
+                "HH011",
+                "low",
+                "SSH allows X11 forwarding (X11Forwarding yes); a headless server rarely needs it",
+                "Set `X11Forwarding no` in /etc/ssh/sshd_config and reload sshd",
             )
         )
     return out

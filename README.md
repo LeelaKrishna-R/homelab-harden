@@ -108,6 +108,7 @@ python3 -m homelab_harden
 | HH008 | high | Accounts with empty passwords |
 | HH009 | high | A datastore (Postgres, MySQL, Redis, Mongo, …) listening on all interfaces |
 | HH010 | low | SSH `MaxAuthTries` raised above OpenSSH's default of 6 |
+| HH011 | low | SSH X11 forwarding enabled (`X11Forwarding yes`) |
 
 It only reports things that are actually misconfigured. An SSH directive that is simply
 unset, or a check it couldn't run, becomes a `note`, not a false alarm.
