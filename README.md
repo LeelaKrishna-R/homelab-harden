@@ -12,10 +12,16 @@ It **never changes your system.** It only reads config files and runs read-only
 commands (`sshd -T`, `ufw status`, `ss`, `systemctl is-active`). Nothing it does can
 break anything.
 
-```
-$ homelab-harden
+![homelab-harden on its bundled sample host: root login and password logins over SSH, no firewall, PostgreSQL on every interface, no automatic updates, no fail2ban, passwordless sudo](docs/demo.svg)
 
-homelab-harden  linux host
+A real run of `--demo`, which audits bundled sample data so it works on any machine. Write-up: [ravuri.dev/work/homelab-harden](https://www.ravuri.dev/work/homelab-harden).
+
+<details>
+<summary>The same run as text</summary>
+
+```
+$ python3 -m homelab_harden --demo
+homelab-harden  linux (sample) host
 
   [HIGH] SSH permits direct root login (PermitRootLogin yes)
          -> Set `PermitRootLogin no` in /etc/ssh/sshd_config and reload sshd
@@ -25,11 +31,18 @@ homelab-harden  linux host
          -> Enable a firewall, e.g. `ufw default deny incoming && ufw enable`
   [HIGH] PostgreSQL is listening on all interfaces at port 5432 (postgres)
          -> Bind it to 127.0.0.1 or a LAN IP, or firewall the port; do not expose PostgreSQL
+  [MED ] Automatic security updates are not enabled
+         -> Enable unattended-upgrades (Debian/Ubuntu) or dnf-automatic.timer (RHEL/Fedora)
   [MED ] fail2ban is not running (no brute-force protection for SSH)
          -> Install and enable it: `apt install fail2ban && systemctl enable --now fail2ban`
+  [MED ] Passwordless sudo is configured (1 NOPASSWD rule(s))
+         -> Remove NOPASSWD from sudoers entries unless a specific automation needs it
 
-  4 high, 1 medium, 0 low
+  4 high, 3 medium, 0 low
+  note: sample data shown by --demo; run without --demo on a Linux host to audit it
 ```
+
+</details>
 
 ## Why
 
