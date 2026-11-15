@@ -63,6 +63,10 @@ everything it can and tells you what it skipped.
 ### Install
 
 ```bash
+# one file, nothing to install: build it anywhere, copy it to the server, run it
+python3 scripts/build_pyz.py                       # writes dist/homelab-harden.pyz
+scp dist/homelab-harden.pyz server: && ssh server 'sudo python3 homelab-harden.pyz'
+
 pipx install homelab-harden      # once it's on PyPI
 # or, from source:
 git clone https://github.com/LeelaKrishna-R/homelab-harden && cd homelab-harden
@@ -108,7 +112,7 @@ Kept small for v0.1. Likely next:
 - **More checks, opt-in**: world-writable files, SUID anomalies, sysctl hardening,
   SSH key algorithms.
 - **A config file** for the rules you `--ignore` every time, so cron runs stay short.
-- **zipapp / single-file** build so it runs with one `curl`.
+- **Release the single-file build** (`scripts/build_pyz.py`) as a download, so it runs with one `curl`.
 
 Have a check you keep wishing existed? Open an issue.
 
