@@ -70,3 +70,8 @@ def test_parse_sshd_config_reads_max_auth_tries():
 
 def test_parse_sshd_config_reads_x11_forwarding():
     assert parsers.parse_sshd_config("x11forwarding yes\n", "sshd -T").x11_forwarding == "yes"
+
+
+def test_parse_sshd_config_reads_permit_user_environment():
+    cfg = parsers.parse_sshd_config("permituserenvironment LANG,LC_*\n", "sshd -T")
+    assert cfg.permit_user_environment == "LANG,LC_*"

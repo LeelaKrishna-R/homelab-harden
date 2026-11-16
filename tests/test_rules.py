@@ -67,3 +67,13 @@ def test_x11_forwarding_is_flagged_only_when_on():
 
     assert audit("yes") == {"HH011"}
     assert audit("no") == set() and audit(None) == set()
+
+
+def test_permit_user_environment_is_flagged_unless_no():
+    def audit(value):
+        return rule_ids(
+            evaluate(Facts(platform="linux", ssh=SshConfig(permit_user_environment=value)))
+        )
+
+    assert audit("yes") == {"HH012"} and audit("LANG,LC_*") == {"HH012"}
+    assert audit("no") == set() and audit(None) == set()

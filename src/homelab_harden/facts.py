@@ -20,6 +20,7 @@ class SshConfig:
     permit_empty_passwords: str | None = None
     max_auth_tries: str | None = None
     x11_forwarding: str | None = None
+    permit_user_environment: str | None = None
     source: str = "unavailable"
 
 

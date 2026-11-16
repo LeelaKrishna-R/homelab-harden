@@ -10,6 +10,7 @@ _SSH_KEYS = {
     "permitemptypasswords",
     "maxauthtries",
     "x11forwarding",
+    "permituserenvironment",
 }
 _PROC_NAME = re.compile(r'\("([^"]+)"')
 
@@ -32,6 +33,7 @@ def parse_sshd_config(text: str, source: str = "config file") -> SshConfig:
         permit_empty_passwords=found.get("permitemptypasswords"),
         max_auth_tries=found.get("maxauthtries"),
         x11_forwarding=found.get("x11forwarding"),
+        permit_user_environment=found.get("permituserenvironment"),
         source=source,
     )
 

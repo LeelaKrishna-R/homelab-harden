@@ -38,6 +38,7 @@ RULES: dict[str, tuple[str, str]] = {
     ),
     "HH010": ("low", "SSH MaxAuthTries raised above OpenSSH's default of 6"),
     "HH011": ("low", "SSH X11 forwarding enabled on a server"),
+    "HH012": ("medium", "SSH lets users set their own environment (PermitUserEnvironment)"),
 }
 RULE_IDS = tuple(RULES)
 
@@ -101,6 +102,18 @@ def _ssh_rules(ssh: SshConfig) -> list[Finding]:
                 "low",
                 "SSH allows X11 forwarding (X11Forwarding yes); a headless server rarely needs it",
                 "Set `X11Forwarding no` in /etc/ssh/sshd_config and reload sshd",
+            )
+        )
+    # "yes", or a pattern list (OpenSSH 7.8+): anything but "no" lets ~/.ssh/environment set
+    # variables like LD_PRELOAD before a forced command runs, which can step around it
+    env = (ssh.permit_user_environment or "").strip()
+    if env and env.lower() != "no":
+        out.append(
+            Finding(
+                "HH012",
+                "medium",
+                f"SSH lets users set their own environment (PermitUserEnvironment {env})",
+                "Set `PermitUserEnvironment no` in /etc/ssh/sshd_config and reload sshd",
             )
         )
     return out
