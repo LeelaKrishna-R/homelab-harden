@@ -25,6 +25,9 @@ def parse_sshd_config(text: str, source: str = "config file") -> SshConfig:
         if len(parts) != 2:
             continue
         key = parts[0].lower()
+        # Everything after the first Match applies only to the connections it matches
+        if key == "match":
+            break
         if key in _SSH_KEYS and key not in found:
             found[key] = parts[1].strip().strip('"')
     return SshConfig(

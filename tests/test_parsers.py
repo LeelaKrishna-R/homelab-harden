@@ -75,3 +75,15 @@ def test_parse_sshd_config_reads_x11_forwarding():
 def test_parse_sshd_config_reads_permit_user_environment():
     cfg = parsers.parse_sshd_config("permituserenvironment LANG,LC_*\n", "sshd -T")
     assert cfg.permit_user_environment == "LANG,LC_*"
+
+
+def test_parse_sshd_config_ignores_settings_inside_match_blocks():
+    text = (
+        "PermitRootLogin no\n"
+        "Match User backup\n"
+        "    PasswordAuthentication yes\n"
+        "    PermitRootLogin yes\n"
+    )
+    ssh = parsers.parse_sshd_config(text)
+    assert ssh.permit_root_login == "no"
+    assert ssh.password_authentication is None
