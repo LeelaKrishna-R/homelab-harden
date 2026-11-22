@@ -21,6 +21,7 @@ class SshConfig:
     max_auth_tries: str | None = None
     x11_forwarding: str | None = None
     permit_user_environment: str | None = None
+    gateway_ports: str | None = None
     source: str = "unavailable"
 
 

@@ -110,6 +110,7 @@ python3 -m homelab_harden
 | HH010 | low | SSH `MaxAuthTries` raised above OpenSSH's default of 6 |
 | HH011 | low | SSH X11 forwarding enabled (`X11Forwarding yes`) |
 | HH012 | medium | SSH lets users set their own environment (`PermitUserEnvironment` not `no`) |
+| HH013 | medium | SSH remote forwards can listen on every interface (`GatewayPorts` not `no`) |
 
 It only reports things that are actually misconfigured. An SSH directive that is simply
 unset, or a check it couldn't run, becomes a `note`, not a false alarm.

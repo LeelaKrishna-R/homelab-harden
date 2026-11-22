@@ -77,3 +77,11 @@ def test_permit_user_environment_is_flagged_unless_no():
 
     assert audit("yes") == {"HH012"} and audit("LANG,LC_*") == {"HH012"}
     assert audit("no") == set() and audit(None) == set()
+
+
+def test_gateway_ports_is_flagged_unless_no():
+    def audit(value):
+        return rule_ids(evaluate(Facts(platform="linux", ssh=SshConfig(gateway_ports=value))))
+
+    assert audit("yes") == {"HH013"} and audit("clientspecified") == {"HH013"}
+    assert audit("no") == set() and audit("No") == set() and audit(None) == set()

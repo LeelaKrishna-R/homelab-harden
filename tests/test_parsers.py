@@ -77,6 +77,11 @@ def test_parse_sshd_config_reads_permit_user_environment():
     assert cfg.permit_user_environment == "LANG,LC_*"
 
 
+def test_parse_sshd_config_reads_gateway_ports():
+    cfg = parsers.parse_sshd_config("gatewayports clientspecified\n", "sshd -T")
+    assert cfg.gateway_ports == "clientspecified"
+
+
 def test_parse_sshd_config_ignores_settings_inside_match_blocks():
     text = (
         "PermitRootLogin no\n"

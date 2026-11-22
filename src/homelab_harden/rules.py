@@ -39,6 +39,7 @@ RULES: dict[str, tuple[str, str]] = {
     "HH010": ("low", "SSH MaxAuthTries raised above OpenSSH's default of 6"),
     "HH011": ("low", "SSH X11 forwarding enabled on a server"),
     "HH012": ("medium", "SSH lets users set their own environment (PermitUserEnvironment)"),
+    "HH013": ("medium", "SSH remote forwards can listen on every interface (GatewayPorts)"),
 }
 RULE_IDS = tuple(RULES)
 
@@ -114,6 +115,18 @@ def _ssh_rules(ssh: SshConfig) -> list[Finding]:
                 "medium",
                 f"SSH lets users set their own environment (PermitUserEnvironment {env})",
                 "Set `PermitUserEnvironment no` in /etc/ssh/sshd_config and reload sshd",
+            )
+        )
+    # "yes" binds every `ssh -R` forward on all interfaces; "clientspecified" lets the client
+    # ask for that. Either way a user can open a port on the LAN that the firewall plan never saw
+    gw = (ssh.gateway_ports or "").strip()
+    if gw and gw.lower() != "no":
+        out.append(
+            Finding(
+                "HH013",
+                "medium",
+                f"SSH remote forwards can listen on every interface (GatewayPorts {gw})",
+                "Set `GatewayPorts no` in /etc/ssh/sshd_config and reload sshd",
             )
         )
     return out
