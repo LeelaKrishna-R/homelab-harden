@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import glob
 import os
 import platform as platform_mod
 import shutil
@@ -48,12 +49,35 @@ def _collect_ssh(facts: Facts) -> None:
     text = _run(["sshd", "-T"]) if shutil.which("sshd") else None
     source = "sshd -T"
     if not text:
-        text = _read("/etc/ssh/sshd_config")
+        text = read_sshd_config("/etc/ssh/sshd_config")
         source = "config file"
     if not text:
         facts.notes.append("could not read SSH configuration")
         return
     facts.ssh = parsers.parse_sshd_config(text, source)
+
+
+def read_sshd_config(path: str, depth: int = 0) -> str | None:
+    """The config as sshd reads it: each `Include` replaced in place by the files it names
+    (globbed, sorted, relative to /etc/ssh). sshd keeps the first value it sees, and Ubuntu's
+    default file includes sshd_config.d/*.conf at the top, so a cloud image's
+    `PasswordAuthentication yes` there wins."""
+    text = _read(path)
+    if text is None or depth > 4:
+        return text
+    out: list[str] = []
+    for line in text.splitlines():
+        parts = line.strip().split()
+        if len(parts) > 1 and parts[0].lower() == "include":
+            for pattern in parts[1:]:
+                full = pattern if os.path.isabs(pattern) else os.path.join("/etc/ssh", pattern)
+                for name in sorted(glob.glob(full)):
+                    included = read_sshd_config(name, depth + 1)
+                    if included:
+                        out.append(included)
+            continue
+        out.append(line)
+    return "\n".join(out)
 
 
 def _collect_firewall(facts: Facts) -> None:

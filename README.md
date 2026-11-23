@@ -71,7 +71,8 @@ homelab-harden --list-rules              # every rule id, its severity and what 
 
 Run with `sudo` for the full picture: reading `/etc/shadow` (empty-password accounts)
 and the effective `sshd -T` config both need root. Without root it still audits
-everything it can and tells you what it skipped.
+everything it can and tells you what it skipped. Without `sshd -T` it reads
+`/etc/ssh/sshd_config` with its `Include` files expanded in place, as sshd does.
 
 ### Install
 
