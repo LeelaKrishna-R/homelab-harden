@@ -41,6 +41,7 @@ RULES: dict[str, tuple[str, str]] = {
     "HH012": ("medium", "SSH lets users set their own environment (PermitUserEnvironment)"),
     "HH013": ("medium", "SSH remote forwards can listen on every interface (GatewayPorts)"),
     "HH014": ("medium", "SSH lets clients open tun/tap tunnels into the network (PermitTunnel)"),
+    "HH015": ("medium", "SSH offers weak ciphers, MACs or key exchange (CBC, arcfour, MD5, SHA-1)"),
 }
 RULE_IDS = tuple(RULES)
 
@@ -56,6 +57,52 @@ def evaluate(facts: Facts) -> list[Finding]:
     out += _shadow_rules(facts)
     out += _listener_rules(facts)
     return sorted(out, key=lambda f: (-SEVERITY_RANK[f.severity], f.rule))
+
+
+_WEAK_SSH = {
+    "ciphers": {
+        "3des-cbc",
+        "aes128-cbc",
+        "aes192-cbc",
+        "aes256-cbc",
+        "blowfish-cbc",
+        "cast128-cbc",
+        "arcfour",
+        "arcfour128",
+        "arcfour256",
+        "rijndael-cbc@lysator.liu.se",
+    },
+    "macs": {
+        "hmac-md5",
+        "hmac-md5-96",
+        "hmac-sha1-96",
+        "hmac-md5-etm@openssh.com",
+        "hmac-md5-96-etm@openssh.com",
+        "hmac-sha1-96-etm@openssh.com",
+    },
+    "kexalgorithms": {
+        "diffie-hellman-group1-sha1",
+        "diffie-hellman-group14-sha1",
+        "diffie-hellman-group-exchange-sha1",
+    },
+}
+
+
+def weak_ssh_algorithms(ssh: SshConfig) -> list[str]:
+    """The weak names each list offers. A config file's `+a,b` appends them to the defaults and
+    still offers them; `-a` removes and `^a` puts first, so only `-` drops a name."""
+    out: list[str] = []
+    for key, value in (
+        ("ciphers", ssh.ciphers),
+        ("macs", ssh.macs),
+        ("kexalgorithms", ssh.kex_algorithms),
+    ):
+        text = (value or "").strip()
+        if not text or text.startswith("-"):
+            continue
+        names = [n.strip().lower() for n in text.lstrip("+^").split(",")]
+        out += [n for n in names if n in _WEAK_SSH[key]]
+    return out
 
 
 def _ssh_rules(ssh: SshConfig) -> list[Finding]:
@@ -140,6 +187,17 @@ def _ssh_rules(ssh: SshConfig) -> list[Finding]:
                 "medium",
                 f"SSH lets clients open tun/tap tunnels into the network (PermitTunnel {tun})",
                 "Set `PermitTunnel no` in /etc/ssh/sshd_config and reload sshd",
+            )
+        )
+    weak = weak_ssh_algorithms(ssh)
+    if weak:
+        out.append(
+            Finding(
+                "HH015",
+                "medium",
+                f"SSH offers weak algorithms: {', '.join(weak)}",
+                "Remove them from Ciphers / MACs / KexAlgorithms in /etc/ssh/sshd_config "
+                "(OpenSSH's defaults are fine) and reload sshd",
             )
         )
     return out

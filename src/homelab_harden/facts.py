@@ -23,6 +23,9 @@ class SshConfig:
     permit_user_environment: str | None = None
     gateway_ports: str | None = None
     permit_tunnel: str | None = None
+    ciphers: str | None = None
+    macs: str | None = None
+    kex_algorithms: str | None = None
     source: str = "unavailable"
 
 

@@ -13,6 +13,9 @@ _SSH_KEYS = {
     "permituserenvironment",
     "gatewayports",
     "permittunnel",
+    "ciphers",
+    "macs",
+    "kexalgorithms",
 }
 _PROC_NAME = re.compile(r'\("([^"]+)"')
 
@@ -41,6 +44,9 @@ def parse_sshd_config(text: str, source: str = "config file") -> SshConfig:
         permit_user_environment=found.get("permituserenvironment"),
         gateway_ports=found.get("gatewayports"),
         permit_tunnel=found.get("permittunnel"),
+        ciphers=found.get("ciphers"),
+        macs=found.get("macs"),
+        kex_algorithms=found.get("kexalgorithms"),
         source=source,
     )
 

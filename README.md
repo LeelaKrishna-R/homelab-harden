@@ -113,6 +113,7 @@ python3 -m homelab_harden
 | HH012 | medium | SSH lets users set their own environment (`PermitUserEnvironment` not `no`) |
 | HH013 | medium | SSH remote forwards can listen on every interface (`GatewayPorts` not `no`) |
 | HH014 | medium | SSH lets clients open tun/tap tunnels into the network (`PermitTunnel` not `no`) |
+| HH015 | medium | SSH offers weak ciphers, MACs or key exchange (CBC, arcfour, MD5, SHA-1 groups) |
 
 It only reports things that are actually misconfigured. An SSH directive that is simply
 unset, or a check it couldn't run, becomes a `note`, not a false alarm.

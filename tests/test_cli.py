@@ -63,7 +63,7 @@ def test_an_unknown_rule_id_is_a_usage_error(capsys):
 def test_list_rules_prints_every_rule_and_exits_zero(capsys):
     assert cli.main(["--list-rules"]) == 0
     lines = capsys.readouterr().out.strip().splitlines()
-    assert len(lines) == 14 and lines[0].startswith("HH001  high")
+    assert len(lines) == 15 and lines[0].startswith("HH001  high")
     assert any(line.startswith("HH006  medium") and "fail2ban" in line for line in lines)
 
 

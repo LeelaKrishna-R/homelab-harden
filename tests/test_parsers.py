@@ -97,3 +97,14 @@ def test_parse_sshd_config_ignores_settings_inside_match_blocks():
     ssh = parsers.parse_sshd_config(text)
     assert ssh.permit_root_login == "no"
     assert ssh.password_authentication is None
+
+
+def test_parse_sshd_config_reads_algorithm_lists():
+    cfg = parsers.parse_sshd_config(
+        "ciphers aes128-ctr,aes256-cbc\nmacs hmac-sha2-256\nkexalgorithms curve25519-sha256\n"
+    )
+    assert (cfg.ciphers, cfg.macs, cfg.kex_algorithms) == (
+        "aes128-ctr,aes256-cbc",
+        "hmac-sha2-256",
+        "curve25519-sha256",
+    )

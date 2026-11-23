@@ -94,3 +94,17 @@ def test_permit_tunnel_is_flagged_unless_no():
     for value in ("yes", "ethernet", "point-to-point"):
         assert audit(value) == {"HH014"}
     assert audit("no") == set() and audit("No") == set() and audit(None) == set()
+
+
+def test_weak_ssh_algorithms_are_flagged_and_a_removal_is_not():
+    def audit(**kw):
+        return rule_ids(evaluate(Facts(platform="linux", ssh=SshConfig(**kw))))
+
+    modern = "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-ctr"
+    assert audit(ciphers=modern) == set()
+    assert audit(ciphers=modern + ",aes256-cbc") == {"HH015"}
+    assert audit(ciphers="+3des-cbc") == {"HH015"}  # appended to the defaults: still offered
+    assert audit(ciphers="-aes256-cbc,3des-cbc") == set()  # a removal list offers nothing
+    assert audit(macs="hmac-sha2-256,hmac-md5") == {"HH015"}
+    assert audit(kex_algorithms="curve25519-sha256,diffie-hellman-group14-sha1") == {"HH015"}
+    assert audit(kex_algorithms="curve25519-sha256,diffie-hellman-group14-sha256") == set()
