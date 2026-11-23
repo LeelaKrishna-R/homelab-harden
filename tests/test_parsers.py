@@ -82,6 +82,11 @@ def test_parse_sshd_config_reads_gateway_ports():
     assert cfg.gateway_ports == "clientspecified"
 
 
+def test_parse_sshd_config_reads_permit_tunnel():
+    cfg = parsers.parse_sshd_config("permittunnel point-to-point\n", "sshd -T")
+    assert cfg.permit_tunnel == "point-to-point"
+
+
 def test_parse_sshd_config_ignores_settings_inside_match_blocks():
     text = (
         "PermitRootLogin no\n"

@@ -85,3 +85,12 @@ def test_gateway_ports_is_flagged_unless_no():
 
     assert audit("yes") == {"HH013"} and audit("clientspecified") == {"HH013"}
     assert audit("no") == set() and audit("No") == set() and audit(None) == set()
+
+
+def test_permit_tunnel_is_flagged_unless_no():
+    def audit(value):
+        return rule_ids(evaluate(Facts(platform="linux", ssh=SshConfig(permit_tunnel=value))))
+
+    for value in ("yes", "ethernet", "point-to-point"):
+        assert audit(value) == {"HH014"}
+    assert audit("no") == set() and audit("No") == set() and audit(None) == set()

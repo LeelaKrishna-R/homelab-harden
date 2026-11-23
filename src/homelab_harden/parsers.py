@@ -12,6 +12,7 @@ _SSH_KEYS = {
     "x11forwarding",
     "permituserenvironment",
     "gatewayports",
+    "permittunnel",
 }
 _PROC_NAME = re.compile(r'\("([^"]+)"')
 
@@ -39,6 +40,7 @@ def parse_sshd_config(text: str, source: str = "config file") -> SshConfig:
         x11_forwarding=found.get("x11forwarding"),
         permit_user_environment=found.get("permituserenvironment"),
         gateway_ports=found.get("gatewayports"),
+        permit_tunnel=found.get("permittunnel"),
         source=source,
     )
 

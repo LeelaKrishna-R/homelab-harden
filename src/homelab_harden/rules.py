@@ -40,6 +40,7 @@ RULES: dict[str, tuple[str, str]] = {
     "HH011": ("low", "SSH X11 forwarding enabled on a server"),
     "HH012": ("medium", "SSH lets users set their own environment (PermitUserEnvironment)"),
     "HH013": ("medium", "SSH remote forwards can listen on every interface (GatewayPorts)"),
+    "HH014": ("medium", "SSH lets clients open tun/tap tunnels into the network (PermitTunnel)"),
 }
 RULE_IDS = tuple(RULES)
 
@@ -127,6 +128,18 @@ def _ssh_rules(ssh: SshConfig) -> list[Finding]:
                 "medium",
                 f"SSH remote forwards can listen on every interface (GatewayPorts {gw})",
                 "Set `GatewayPorts no` in /etc/ssh/sshd_config and reload sshd",
+            )
+        )
+    # Any value but "no" lets an ssh -w client bring up a tun/tap device on the server: a VPN into
+    # the LAN that skips whatever the firewall allows between hosts
+    tun = (ssh.permit_tunnel or "").strip()
+    if tun and tun.lower() != "no":
+        out.append(
+            Finding(
+                "HH014",
+                "medium",
+                f"SSH lets clients open tun/tap tunnels into the network (PermitTunnel {tun})",
+                "Set `PermitTunnel no` in /etc/ssh/sshd_config and reload sshd",
             )
         )
     return out

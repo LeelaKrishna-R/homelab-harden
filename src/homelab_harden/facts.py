@@ -22,6 +22,7 @@ class SshConfig:
     x11_forwarding: str | None = None
     permit_user_environment: str | None = None
     gateway_ports: str | None = None
+    permit_tunnel: str | None = None
     source: str = "unavailable"
 
 
