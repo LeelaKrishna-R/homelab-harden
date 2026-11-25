@@ -108,3 +108,13 @@ def test_weak_ssh_algorithms_are_flagged_and_a_removal_is_not():
     assert audit(macs="hmac-sha2-256,hmac-md5") == {"HH015"}
     assert audit(kex_algorithms="curve25519-sha256,diffie-hellman-group14-sha1") == {"HH015"}
     assert audit(kex_algorithms="curve25519-sha256,diffie-hellman-group14-sha256") == set()
+
+
+def test_sha1_signature_algorithms_are_weak():
+    def audit(**kw):
+        return rule_ids(evaluate(Facts(platform="linux", ssh=SshConfig(**kw))))
+
+    assert audit(host_key_algorithms="ssh-ed25519,rsa-sha2-512") == set()
+    assert audit(host_key_algorithms="+ssh-rsa") == {"HH015"}
+    assert audit(pubkey_algorithms="ssh-ed25519,ssh-dss") == {"HH015"}
+    assert audit(pubkey_algorithms="-ssh-rsa") == set()

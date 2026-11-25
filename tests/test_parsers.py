@@ -108,3 +108,10 @@ def test_parse_sshd_config_reads_algorithm_lists():
         "hmac-sha2-256",
         "curve25519-sha256",
     )
+
+
+def test_parse_sshd_config_reads_the_old_pubkey_name_too():
+    cfg = parsers.parse_sshd_config(
+        "pubkeyacceptedkeytypes +ssh-rsa\nhostkeyalgorithms ssh-ed25519\n"
+    )
+    assert (cfg.pubkey_algorithms, cfg.host_key_algorithms) == ("+ssh-rsa", "ssh-ed25519")

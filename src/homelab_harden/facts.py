@@ -26,6 +26,8 @@ class SshConfig:
     ciphers: str | None = None
     macs: str | None = None
     kex_algorithms: str | None = None
+    host_key_algorithms: str | None = None
+    pubkey_algorithms: str | None = None
     source: str = "unavailable"
 
 

@@ -85,6 +85,19 @@ _WEAK_SSH = {
         "diffie-hellman-group14-sha1",
         "diffie-hellman-group-exchange-sha1",
     },
+    # SHA-1 signatures: OpenSSH 8.8+ turns these off by default; an old config turns them back on
+    "hostkeyalgorithms": {
+        "ssh-rsa",
+        "ssh-dss",
+        "ssh-rsa-cert-v01@openssh.com",
+        "ssh-dss-cert-v01@openssh.com",
+    },
+    "pubkeyacceptedalgorithms": {
+        "ssh-rsa",
+        "ssh-dss",
+        "ssh-rsa-cert-v01@openssh.com",
+        "ssh-dss-cert-v01@openssh.com",
+    },
 }
 
 
@@ -96,6 +109,8 @@ def weak_ssh_algorithms(ssh: SshConfig) -> list[str]:
         ("ciphers", ssh.ciphers),
         ("macs", ssh.macs),
         ("kexalgorithms", ssh.kex_algorithms),
+        ("hostkeyalgorithms", ssh.host_key_algorithms),
+        ("pubkeyacceptedalgorithms", ssh.pubkey_algorithms),
     ):
         text = (value or "").strip()
         if not text or text.startswith("-"):

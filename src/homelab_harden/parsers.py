@@ -16,6 +16,9 @@ _SSH_KEYS = {
     "ciphers",
     "macs",
     "kexalgorithms",
+    "hostkeyalgorithms",
+    "pubkeyacceptedalgorithms",
+    "pubkeyacceptedkeytypes",
 }
 _PROC_NAME = re.compile(r'\("([^"]+)"')
 
@@ -47,6 +50,10 @@ def parse_sshd_config(text: str, source: str = "config file") -> SshConfig:
         ciphers=found.get("ciphers"),
         macs=found.get("macs"),
         kex_algorithms=found.get("kexalgorithms"),
+        host_key_algorithms=found.get("hostkeyalgorithms"),
+        # PubkeyAcceptedKeyTypes is the pre-8.5 name of the same setting
+        pubkey_algorithms=found.get("pubkeyacceptedalgorithms")
+        or found.get("pubkeyacceptedkeytypes"),
         source=source,
     )
 
